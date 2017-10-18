@@ -1,0 +1,26 @@
+netca 遇到TNS-04612: "XXX" 的 RHS 为空 
+2013-09-12 09:22:53
+
+ 在配置NETCA的时候 曾经遇到过这样的案例
+
+C:\Documents and Settings\Administrator>netca
+
+Oracle Net Services 配置:
+正在配置监听程序:LISTENER
+ServiceAliasException: 无法初始化服务别名: TNS-04404: 没有错误
+  caused by: oracle.net.config.ConfigException: TNS-04414: 文件错误
+  caused by: TNS-04612: "BSSTZ" 的 RHS 为空
+正在配置监听程序:LISTENER
+ServiceAliasException: 无法初始化服务别名: TNS-04404: 没有错误
+  caused by: oracle.net.config.ConfigException: TNS-04414: 文件错误
+  caused by: TNS-04612: "xxxxBSSTZ" 的 RHS 为空
+用户终止了 Oracle Net Services 配置。退出代码是-1
+
+ 
+
+因为之前就遇到一次， 从接触ORACLE 到现在一共遇到不到3次，
+所以之前就没有记录， 错误是由于自己更改LISTENA.ORA文件，错误的语法引起的，但是怎么改也改不回去了。 不清楚为什么。
+
+后来就把LISTENER.ORA删除掉，还是不行,netca弹出来的JAVA界面已经卡住了。
+
+原因是由于 删除了LISTENER.ORA却没有删除TNSNAME.ORA 。两者删除之后 这个操作就OK了。

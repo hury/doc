@@ -1,0 +1,47 @@
+@echo off
+title dbcenter 备份[%date% %time%]
+
+SET remote_path=\\172.18.1.30\数据库备份\platform_bak
+echo 远程备份目录:%remote_path%
+
+rem expdp模式
+expdp sa/bsoft@dbcenter directory=dbcenter_bak dumpfile=dbcenter.dmp logfile=dbcenter.log job_name=dbcenter_expdp compression=all
+
+rem exp模式
+rem exp pfuser/bsoftpfuser@172.16.1.121/orcl file=platform.dmp log=platform.log compress=n
+
+rem --------------------------------------------
+IF ERRORLEVEL 1 goto err_backup
+
+rem 删除过期备份文件
+del /f *.rar
+
+rem 压缩文件
+rar -v20g a dbcenter.rar dbcenter.dmp
+IF ERRORLEVEL 1 goto err_rar
+
+rem 删除临时文件
+del /f *.dmp
+
+rem 拷贝文件 
+copy * %remote_path%
+IF ERRORLEVEL 1 goto err_copy
+exit 
+
+rem --------------------------------------------
+rem 错误处理
+
+:err_backup
+echo 执行数据备份命令失败，请手工处理。
+goto wait_user_process
+
+:err_rar
+echo 数据压缩失败，请手工处理。
+goto wait_user_process
+
+:err_copy
+echo 将数据拷贝到备份服务器失败，请手工处理。
+
+:wait_user_process
+pause
+

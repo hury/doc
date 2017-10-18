@@ -1,0 +1,53 @@
+rem Oracle数据库备份脚本
+rem 1、提供两种备份模式：exp，exp_dp；
+rem 2、提供数据压缩功能；
+rem 3、提供将备份文件拷贝到远程目录功能；
+rem 4、提供异常处理功能；
+
+@echo off
+title [数据库名称]备份[%date% %time%]
+
+SET remote_path=\\IP\数据库备份\数据库名称_bak
+echo 远程备份目录:%remote_path%
+
+rem expdp模式
+expdp 用户名/密码@数据库名称 directory=数据库名称_bak dumpfile=数据库名称.dmp logfile=数据库名称.log job_name=数据库名称_expdp compression=all
+
+rem exp模式
+rem exp 用户名/密码@IP/数据库名称 file=数据库名称.dmp log=日志名称.log compress=n
+
+rem --------------------------------------------
+IF ERRORLEVEL 1 goto err_backup
+
+rem 删除过期备份文件
+del /f *.rar
+
+rem 压缩文件
+rar -v20g a 数据库名称.rar 数据库名称.dmp
+IF ERRORLEVEL 1 goto err_rar
+
+rem 删除临时文件
+del /f *.dmp
+
+rem 拷贝文件 
+copy * %remote_path%
+IF ERRORLEVEL 1 goto err_copy
+exit 
+
+rem --------------------------------------------
+rem 错误处理
+
+:err_backup
+echo 执行数据备份命令失败，请手工处理。
+goto wait_user_process
+
+:err_rar
+echo 数据压缩失败，请手工处理。
+goto wait_user_process
+
+:err_copy
+echo 将数据拷贝到备份服务器失败，请手工处理。
+
+:wait_user_process
+pause
+

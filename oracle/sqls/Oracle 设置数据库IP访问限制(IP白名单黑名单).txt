@@ -1,0 +1,34 @@
+Oracle 设置数据库IP访问限制(IP白名单黑名单)
+可以通过修改sqlnet.ora文件来限制某些IP地址的访问，修改完成后，可能需重启监听生效。(可以lsnrctl reload)
+如果$ORACLE_HOME/network/admin/目录下没有sqlnet.ora文件，可以从samples目录下拷贝个sqlnet.ora或者直接vi
+###########二选一##############
+#允许访问的IP
+TCP.INVITED_NODES=(192.168.1.103,ip2,ip3,..,..本地IP..)若使用白名单，必须本地IP，否则监听会起不来
+#不允许访问的IP
+TCP.EXCLUDED_NODES=(192.168.1.102)
+#检测上述参数的设置
+TCP.VALIDNODE_CHECKING=yes (这个参数是必须的)
+
+#允许访问的ip tcp.invited_nodes =(ip1,ip2,……) #不允许访问的ip tcp.excluded_nodes=(ip1,ip2,……)
+TCP.INVITED_NODES：设置允许访问数据库的IP地址列表，当这个参数和TCP.EXCLUDED_NODES设置的地址相同的时候将覆盖TCP.EXCLUDED_NODES设置。
+
+当不允许访问的客户端连入时，会出现下列错误
+sys/oracle@approd.testas sysdba
+ERROR:
+ORA-12537: TNS:connection closed
+
+
+Warning: You are no longer connected to ORACLE.
+
+
+需要注意的问题：
+1、 需要设置参数为YES,这样才能激活。
+2、 建议设置允许访问的IP，因为IP地址有可能被随意修改，就不能起到自己的目的。
+3、 TCP当参数TCP.INVITED_NODES和TCP.EXCLUDED_NODES设置的地址相同的时候将覆盖TCP.EXCLUDED_NODES设置。
+4、 需要重启监听器才能生效。
+5、 这个方式只是适合TCP协议。
+6、 这个配置适用于9i以上版本。在9i之前的版本使用文件protocol.ora。
+7、 在服务器上直接连接数据库不受影响。
+8、 这种限制方式事通过监听器来限制的。
+ 9、 这个限制只是针对IP检测，对于用户名检测事不支持的。
+10、使用触发器(通过监听器的限制，通常属于轻量级的，比在数据库内
