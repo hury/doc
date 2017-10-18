@@ -1,1 +1,2 @@
-这个仅是一个测试功能
+git is a distributed version control system
+git is free software distributed under the gpl
